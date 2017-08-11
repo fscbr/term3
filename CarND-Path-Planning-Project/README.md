@@ -1,9 +1,11 @@
 # CarND-Path-Planning-Project
 Self-Driving Car Engineer Nanodegree Program
    
-### Simulator. You can download the Term3 Simulator BETA which contains the Path Planning Project from the [releases tab](https://github.com/udacity/self-driving-car-sim/releases).
+### Simulator.
+You can download the Term3 Simulator which contains the Path Planning Project from the [releases tab (https://github.com/udacity/self-driving-car-sim/releases).
 
-In this project your goal is to safely navigate around a virtual highway with other traffic that is driving +-10 MPH of the 50 MPH speed limit. You will be provided the car's localization and sensor fusion data, there is also a sparse map list of waypoints around the highway. The car should try to go as close as possible to the 50 MPH speed limit, which means passing slower traffic when possible, note that other cars will try to change lanes too. The car should avoid hitting other cars at all cost as well as driving inside of the marked road lanes at all times, unless going from one lane to another. The car should be able to make one complete loop around the 6946m highway. Since the car is trying to go 50 MPH, it should take a little over 5 minutes to complete 1 loop. Also the car should not experience total acceleration over 10 m/s^2 and jerk that is greater than 50 m/s^3.
+### Goals
+In this project the goal is to safely navigate around a virtual highway with other traffic that is driving +-10 MPH of the 50 MPH speed limit. The Simulator will provides the car's localization and sensor fusion data, there is also a sparse map list of waypoints around the highway. The car should try to go as close as possible to the 50 MPH speed limit, which means passing slower traffic when possible, note that other cars will try to change lanes too. The car should avoid hitting other cars at all cost as well as driving inside of the marked road lanes at all times, unless going from one lane to another. The car should be able to make one complete loop around the 6946m highway. Since the car is trying to go 50 MPH, it should take a little over 5 minutes to complete 1 loop. Also the car should not experience total acceleration over 10 m/s^2 and jerk that is greater than 50 m/s^3.
 
 #### The map of the highway is in data/highway_map.txt
 Each waypoint in the list contains  [x,y,s,dx,dy] values. x and y are the waypoint's map coordinate position, the s value is the distance along the road to get to that waypoint in meters, the dx and dy values define the unit normal vector pointing outward of the highway loop.
@@ -85,50 +87,107 @@ A really helpful resource for doing this project and creating smooth trajectorie
     git checkout e94b6e1
     ```
 
-## Editor Settings
+## Description
 
-We've purposefully kept editor configuration files out of this repo in order to
-keep it as simple and environment agnostic as possible. However, we recommend
-using the following settings:
+The Project solution consists out of 4 parts:
 
-* indent using spaces
-* set tab width to 2 spaces (keeps the matrices in source code aligned)
+.	Process chain
+.	Vehicle Model for Behavour Planning
+.	Path Prediction and Generation
+.	Jerk Minimizing Trajectory Generation
 
-## Code Style
+#Process chain
+the process chain consists out of these steps:
 
-Please (do your best to) stick to [Google's C++ style guide](https://google.github.io/styleguide/cppguide.html).
+Initially:
+*	load map point database
+*	configure vehicle model  and path planer by providing the values for maximum speed, accelaration, yerk, preferred distance buffers, number of points in a planned path and the time step in seconds.
 
-## Project Instructions and Rubric
+each 10th update cycle plan the car behaviour:
+*	update the own car dynamic values.
+*	update the state of the car model by estimating the possible state having the lowest cost
+*	realize the state anc calulate end values.
 
-Note: regardless of the changes you make, your project must be buildable using
-cmake and make!
+each update cycle generate the path:
+*	receive the sensor fusion data and the previous point list of not yet reached path points
+*	generate a way point point list for the way ahead starting on the current lane and ending on the may be changed future lane
+*	generate smoothed point list that remains in the speed, acceleration and yerk limits and realizes the car model end state
+*	send the point list to the simulator
+
+#Vehicle Model for Behavour Planning
+The Vehicle Model for Behavour Planning is a state machine similar to the Quiz Behavour Planning of the Udacity course.
+
+I use the states Keep Lane(KL), Prepare Left Lane Change(PLCL), Prepare Right Lane Change(PLCR, Change Left Lange(LCL), Change Right Lane(PCR).
+
+The possible state changes are straight forward:
 
 
-## Call for IDE Profiles Pull Requests
+KL -> PLCL if car is not on the left lane
+KL -> PLCR if car is not on the right lane
+PLCL->LCL 
+PLCL->LCR
+ALL->KL
 
-Help your fellow students!
+PLCL and PLCR do not have a specific behaviour in change speed or direction. The states are just used to have a precheck for a change of the lane, I prepared them for
+later enhancements f.ex. adapt speed to the traffic speed on the lane.
 
-We decided to create Makefiles with cmake to keep this project as platform
-agnostic as possible. Similarly, we omitted IDE profiles in order to ensure
-that students don't feel pressured to use one IDE or another.
+#update car dynamic values
+the model receives values s, d, v, a as stat values. the lane is calculated using d.
 
-However! I'd love to help people get up and running with their IDEs of choice.
-If you've created a profile for an IDE that you think other students would
-appreciate, we'd love to have you add the requisite profile files and
-instructions to ide_profiles/. For example if you wanted to add a VS Code
-profile, you'd add:
+#update the state of the car model. 
+the possible states are retrieved.
+This requires the calculation of the speed of cars in front and behind and the distance of closest cars in front and behind.
+Additionally the minimum or maximum acceleration on the lane are calculated.
 
-* /ide_profiles/vscode/.vscode
-* /ide_profiles/vscode/README.md
+The choice of the speed on a lane follows  some rules to ensure the safety of the car:
 
-The README should explain what the profile does, how to take advantage of it,
-and how to install it.
+*	the maximum speed is the speed limit
+*	it will be reduced to the speed of the car in front, if the preferred buffer is close to be violated.
+*	it will be further reduced if the preferred buffer is violated to reestablished this distance to the car in front
+*	for a left or right lane the speed is 0 if preffered buffers in fron or behind would be violated. This will block a lane change in the further process.
 
-Frankly, I've never been involved in a project with multiple IDE profiles
-before. I believe the best way to handle this would be to keep them out of the
-repo root to avoid clutter. My expectation is that most profiles will include
-instructions to copy files to a new location to get picked up by the IDE, but
-that's just a guess.
+acceleration is calculated to ensure the required speed adaptations in one time step (configured by one second)
 
-One last note here: regardless of the IDE used, every submitted project must
-still be compilable with cmake and make./
+Then for all possible states, I estimate a cost value. The cost value is increased by:
+*	own maximum possible speed less than the than the target speed
+*	lack of space to the closest car in front
+*	lack of space to the closest car behind (not for KL)
+
+I chosed the weight of the cost functions to ensure that:
+*	the car keeps KL if the maximum possible speed left and right is the same or less as on the current lane.
+*	the car  changes the Lane, if the speed left or right is is larger and the space in front and behind is larger than a preferred buffer.
+
+The result of the update state method is the estimation of the best state selection the lowest cost.
+
+#realize the state
+the chosen state is set and the resulting acceleration, speed, s, d and lane values are update using a simple prediction function for one time step.
+
+#generate a way point list
+using the received previous point list the lastz point in the list and the previous are retrieved. The delta of x,y and yaw are calculated. 
+
+I choosed to subsribe the point list and not to create a complete new point list in an update cycle.
+
+This is one of two main design design descisions in the project. After developing and testing the full list creating, I recognized that the car path gets jumps from the old to the new path, which can not be smoothe dproperly to 100%
+I always received here and there small breaks of the continuty which violated the max acceleration and jerk constraints.
+I had to give up this approach which costed me days of work.
+
+The second descision has been the choice of the coordinate system to create and subssribe the path.
+I recognized that the frenet coordinate system adds jumps to the coordinates in larger distances, which can be smoothed but lklead to lane violations, that not to 100% can be controlled with out a
+polynominal model solution of the curves. I did not see an benefit in this soficticated approach and decided therefore to switch at that point to the car position coordinate system for extrapolations.
+
+The current car position(0,0) is the reference point for all other points in the path generation. I used my MPC Project transformation functions to convert between car and map positions.
+
+To represent the future path, i choose 3 points having 30m seperation, as this is the regular distance between each waypoint on the map. In case of a lane change, the way point selected have a 60 m distance to ensure a smooth path planning.
+
+These 5 points are used to build and subscribe the path for the simulator.
+
+A spline function is used for interpolation.
+
+In case of a larger speed change jerk minimum polynom is calculated to find a smooth acceleration. This avoid braking the dynamic limits of the car.
+
+The pictures show the speed, and acceleration diagram for a typical case.
+
+ list for the way ahead starting on the current lane and ending on the may be changed future lane
+*	generate smoothed point list that remains in the speed, acceleration and yerk limits and realizes the car model end state
+*	send the point list to the simulator
+.	
