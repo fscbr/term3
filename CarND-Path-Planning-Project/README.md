@@ -91,12 +91,12 @@ A really helpful resource for doing this project and creating smooth trajectorie
 
 The Project solution consists out of 4 parts:
 
-.	Process chain
-.	Vehicle Model for Behavour Planning
-.	Path Prediction and Generation
-.	Jerk Minimizing Trajectory Generation
+*	Process chain
+*	Vehicle Model for Behavour Planning
+*	Path Prediction and Generation
+*	Jerk Minimizing Trajectory Generation
 
-#Process chain
+### Process chain
 the process chain consists out of these steps:
 
 Initially:
@@ -114,7 +114,7 @@ each update cycle generate the path:
 *	generate smoothed point list that remains in the speed, acceleration and yerk limits and realizes the car model end state
 *	send the point list to the simulator
 
-#Vehicle Model for Behavour Planning
+### Vehicle Model for Behavour Planning
 The Vehicle Model for Behavour Planning is a state machine similar to the Quiz Behavour Planning of the Udacity course.
 
 I use the states Keep Lane(KL), Prepare Left Lane Change(PLCL), Prepare Right Lane Change(PLCR, Change Left Lange(LCL), Change Right Lane(PCR).
@@ -131,10 +131,10 @@ ALL->KL
 PLCL and PLCR do not have a specific behaviour in change speed or direction. The states are just used to have a precheck for a change of the lane, I prepared them for
 later enhancements f.ex. adapt speed to the traffic speed on the lane.
 
-#update car dynamic values
+#### update car dynamic values
 the model receives values s, d, v, a as stat values. the lane is calculated using d.
 
-#update the state of the car model. 
+#### update the state of the car model. 
 the possible states are retrieved.
 This requires the calculation of the speed of cars in front and behind and the distance of closest cars in front and behind.
 Additionally the minimum or maximum acceleration on the lane are calculated.
@@ -159,10 +159,13 @@ I chosed the weight of the cost functions to ensure that:
 
 The result of the update state method is the estimation of the best state selection the lowest cost.
 
-#realize the state
+#### realize the state
 the chosen state is set and the resulting acceleration, speed, s, d and lane values are update using a simple prediction function for one time step.
 
-#generate a way point list
+### Path Generation
+I splitted that into two parts
+
+#### generate a way point list
 using the received previous point list the lastz point in the list and the previous are retrieved. The delta of x,y and yaw are calculated. 
 
 I choosed to subsribe the point list and not to create a complete new point list in an update cycle.
@@ -179,6 +182,7 @@ The current car position(0,0) is the reference point for all other points in the
 
 To represent the future path, i choose 3 points having 30m seperation, as this is the regular distance between each waypoint on the map. In case of a lane change, the way point selected have a 60 m distance to ensure a smooth path planning.
 
+#### create and subscripe the path point list
 These 5 points are used to build and subscribe the path for the simulator.
 
 A spline function is used for interpolation.
