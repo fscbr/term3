@@ -1,0 +1,51 @@
+waypoints loaded size:181
+Listening to port 4567
+Connected!!!
+===============================================================
+time:1 dsec:1.502e+09 x:909.48 y:1128.67 angle:0 v: 0 s: 124.834 d: 6.16483
+start s 124.834 s. 0 s.. 0
+start d 6.16483 d. 0 d.. 0
+state KL s:124.834 d:6.16483 lane:1 speed:0 a:0
+max_acc:8
+lane:0 max speed:20 max a:8 available room:999
+max_acc:8
+lane:1 car in front delta_s:123.062 speed:19.2361 available_room:108.062
+car behinds:1
+lane:1 car at behind delta_s:60.4562 speed:20.9661 available_room:60.4562
+lane:1 max speed:20 max a:8 available room:60.4562
+max_acc:8
+lane:2 max speed:20 max a:8 available room:999
+check KL 9.38544
+cost for KL cost 29.3854 
+check L 0
+cost for PLCL cost 20 
+check R 0
+cost for PLCR cost 20 
+new state PLCL
+realized PLCL lane:1 s:124.834 d:6 a:0 v:0
+end s 124.834 s. 0 s.. 0
+end d 6 d. 0 d.. 0
+===============================================================
+time:8 dsec:0.42 x:909.48 y:1128.67 angle:0 v: 0 s: 124.834 d: 6.16483
+start s 124.834 s. 0 s.. 0
+start d 6.16483 d. 0 d.. 0
+state PLCL s:124.834 d:6.16483 lane:1 speed:0 a:0
+max_acc:8
+lane:0 max speed:20 max a:8 available room:999
+max_acc:8
+lane:1 car in front delta_s:130.28 speed:18.5952 available_room:115.28
+car behinds:1
+lane:1 car at behind delta_s:52.2223 speed:20.2714 available_room:52.2223
+lane:1 max speed:20 max a:8 available room:52.2223
+max_acc:8
+lane:2 max speed:20 max a:8 available room:999
+check KL 9.46778
+cost for KL cost 29.4678 
+check L 0
+cost for LCL cost 20 
+new state LCL
+max_acc:8
+lane:0 max speed:20 max a:8 available room:999
+realized LCL lane:0 s:148.834 d:2 a:8 v:20
+end s 148.834 s. 20 s.. 8
+end d 2 d. 0 d.. 0
