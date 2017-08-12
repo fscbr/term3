@@ -79,12 +79,11 @@ The possible state changes are straight forward:
 
 | State | Next state | Constraints |
 |:-----:|:----------:| :----------:|
-
-| KL    | PLCL       | if car is not on the left lane | 
-| KL    | PLCR       | if car is not on the right lane| 
-| PLCL  | LCL        | |
-| PLCL  | LCR        | |
-| ALL   | KL         | |
+| KL    | PLCL       | if car is not on the left lane  | 
+| KL    | PLCR       | if car is not on the right lane | 
+| PLCL  | LCL        |                                 |
+| PLCL  | LCR        |                                 |
+| ALL   | KL         |                                 |
 
 * KL The maximum speed is the target speed or the speed of the car in front closer than the preferred buffer.
 * LCL and LCR The speed is kept reduced to ensure that the lane change will not the excide the speed limit. The maximum speed is the speed of the car in front of the new lane.
