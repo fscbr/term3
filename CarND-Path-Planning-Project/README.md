@@ -2,7 +2,7 @@
 Self-Driving Car Engineer Nanodegree Program
 
 [//]: # (Image References)
-[image1]: ./JMT.jpg "JMT"
+[image1]: ./JMT.jpg "minimum jerk trajectory"
 [video1]: ./project_result.mp4 "Video"
    
 ### Goals
@@ -65,10 +65,10 @@ each 10th update cycle plan the car behaviour:
 *	realize the state anc calulate end values.
 
 each update cycle generate the path:
-*	receive the sensor fusion data and the previous point list of not yet reached path points
-*	generate a way point point list for the way ahead starting on the current lane and ending on the may be changed future lane
-*	generate smoothed point list that remains in the speed, acceleration and yerk limits and realizes the car model end state
-*	send the point list to the simulator
+*	receive the sensor fusion data and the previous point list of not yet reached path points.
+*	generate a way point point list for the way ahead starting on the current lane and ending on the may be changed future lane.
+*	generate smoothed point list that remains in the speed, acceleration and yerk limits and realizes the car model end state.
+*	send the point list to the simulator.
 
 ### Vehicle Model for Behavour Planning
 The Vehicle Model for Behavour Planning is a state machine similar to the Quiz Behavour Planning of the Udacity course.
@@ -78,11 +78,13 @@ I use the states Keep Lane(KL), Prepare Left Lane Change(PLCL), Prepare Right La
 The possible state changes are straight forward:
 
 | State | Next state | Constraints |
-| KL | PLCL | if car is not on the left lane | 
-| KL | PLCR  | if car is not on the right lane | 
-| PLCL | LCL  | 
-| PLCL | LCR | 
-| ALL | KL | 
+|:-----:|:----------:| :----------:|
+
+| KL    | PLCL       | if car is not on the left lane | 
+| KL    | PLCR       | if car is not on the right lane| 
+| PLCL  | LCL        | |
+| PLCL  | LCR        | |
+| ALL   | KL         | |
 
 * KL The maximum speed is the target speed or the speed of the car in front closer than the preferred buffer.
 * LCL and LCR The speed is kept reduced to ensure that the lane change will not the excide the speed limit. The maximum speed is the speed of the car in front of the new lane.
@@ -120,9 +122,11 @@ The result of the update state method is the estimation of the best state select
 the chosen state is set and the resulting acceleration, speed, s, d and lane values are update using a simple prediction function for one time step.
 
 ### Path Generation
-I splitted that into two parts
+I splitted that into two parts:
+* 	plan the path.
+* 	generatethe path point list.
 
-#### generate a way point list
+#### plan the path 
 using the received previous point list the lastz point in the list and the previous are retrieved. The delta of x,y and yaw are calculated. 
 
 I choosed to subsribe the point list and not to create a complete new point list in an update cycle.
@@ -145,7 +149,7 @@ To represent the future path, I choose 3 points having 30m seperation, as this i
 
 In total these 5 points represent the planned path. The are converted in local car coordinates to allow easy shift on the lane. I used my MPC Project transformation functions to convert between car and map positions.
 
-#### create and subscripe the path point list
+#### generate the path point list
 The previous generated 5 path points are used to build and subscribe the path for the simulator.
 They are already converted in local car coordinates.
 
@@ -159,7 +163,7 @@ The pictures show the speed, acceleration and jerk diagram for a acceleration fr
  list for the way ahead starting on the current lane and ending on the may be changed future lane
 *	generate smoothed point list that remains in the speed, acceleration and yerk limits and realizes the car model end state
 *	send the point list to the simulator
-.	
+	
 
 
 ###Demonstration (video)
