@@ -425,13 +425,10 @@ void PathPlanner::mergePath(vector<vector<double>> &merged_path,
     for(int i = 0; i < steps - path_size; i++)
     {
 
-    	double planned_steps = horizent_dist /(temp_speed/steps);
     	if(speed_queue.size() > 0)
     	{
     		temp_speed = speed_queue.front();
     		speed_queue.pop();
-
-    		planned_steps = horizent_dist /(temp_speed/steps);
 
     		//clear queue
         	if(speed_queue.size() == 0 || abs(temp_speed - planned_speed) < target_speed/steps)
@@ -441,8 +438,10 @@ void PathPlanner::mergePath(vector<vector<double>> &merged_path,
     			speed_queue = queue<double>();
         	}
     	}
+    	double dx = temp_speed / steps;
 
-    	next_x = add_x + horizent_x / planned_steps;
+//    	next_x = add_x + horizent_x / planned_steps;
+    	next_x = add_x + dx;
     	next_y = spline_car_pos_y(next_x);
     	add_x = next_x;
 
