@@ -35,8 +35,6 @@ As optimizer I choosed the AdamOptimizer that showed good loss reduction. I play
 
 ![loss.jpg](./loss.jpg)
 
-As trainable variables I selected first only the input node to the decoder and the fcn nodes to improve the performance.
-
 Finally I selected these parameters as practical good solution:
 
 - Epochs: 50
@@ -44,18 +42,32 @@ Finally I selected these parameters as practical good solution:
 - Learning rate: 0.0001
 - Dropouts: 0.2
 
+As trainable variables I selected first only the input node to the decoder and the fcn nodes to improve the performance.
 
-I saved the final model and resulting weights in the [runs](./runs) directory, where all of the latest inference images are also stored.
+I saved the final model and resulting weights in the [runs](./runs) directory, where all of the latest inference images are also stored. The loss value after 50 epoch is 0.059. On epoch training needed about 19s.
 
-### Examples
+Alternativly I trained all variables. One epoch training lasted now 125s. The loss value after 20 epochs is 0.0195. 
+The loss decreased much faster than before.
+
+![loss2.jpg](./loss2.jpg)
+
+
+### Examples 
 The following give examples of the output of this Fully Convolutional Network for Semantic Segmentation training only FCN variables:
 
-![um_000014.png](./runs/1503239015.0926788/umm_000063.png)
+![umm_000063.png](./runs/1503239666.5580473/umm_000063.png)
 
-![um_000028.png](./runs/1503239015.0926788/um_000028.png)
+![um_000028.png](./runs/1503239666.5580473/um_000028.png)
 
-![uu_000099.png](./runs/1503239015.0926788/uu_000090.png)
+![uu_000090.png](./runs/1503239666.5580473/uu_000090.png)
 
+The same examples of the output of this Fully Convolutional Network for Semantic Segmentation training all variables:
+
+![umm_000063.png](./runs/1503243435.0288646/umm_000063.png)
+
+![um_000028.png](./runs/1503243435.0288646/um_000028.png)
+
+![uu_000090.png](./runs/1503243435.0288646/uu_000090.png)
 
 
 
