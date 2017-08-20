@@ -250,6 +250,7 @@ def train_nn(sess, epochs, batch_size, get_batches_fn, train_op, cross_entropy_l
     :param keep_prob: TF Placeholder for dropout keep probability
     :param learning_rate: TF Placeholder for learning rate
     """
+    train_writer = None
     # logger
     if runs_dir is not None:
         if not os.path.exists(runs_dir):
@@ -292,8 +293,9 @@ def train_nn(sess, epochs, batch_size, get_batches_fn, train_op, cross_entropy_l
             loss, _, summary = sess.run(
                 [cross_entropy_loss, train_op, merged],
                 feed_dict={input_image: X, correct_label: y, keep_prob: 0.8})            
-            training_loss += loss           
-        train_writer.add_summary(summary, i)
+            training_loss += loss
+        if train_writer is not None:           
+            train_writer.add_summary(summary, i)
             
         # calculate training loss
         training_loss /= training_samples
@@ -313,8 +315,9 @@ def train_nn(sess, epochs, batch_size, get_batches_fn, train_op, cross_entropy_l
     totaltime = totalendtime - totalstarttime
     print("total execution took {} seconds".format(totaltime))
     
-    tf.train.Saver().save(sess, 'trained_model')   
-#tests.test_train_nn(train_nn)
+    if runs_dir is not None:
+        tf.train.Saver().save(sess, 'trained_model')   
+tests.test_train_nn(train_nn)
 
 
 def run():

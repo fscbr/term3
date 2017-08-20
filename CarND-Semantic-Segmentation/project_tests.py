@@ -121,6 +121,7 @@ def test_train_nn(train_nn):
 
     train_op = tf.constant(0)
     cross_entropy_loss = tf.constant(10.11)
+    merged = tf.constant(1)
     input_image = tf.placeholder(tf.float32, name='input_image')
     correct_label = tf.placeholder(tf.float32, name='correct_label')
     keep_prob = tf.placeholder(tf.float32, name='keep_prob')
@@ -133,6 +134,7 @@ def test_train_nn(train_nn):
             'get_batches_fn': get_batches_fn,
             'train_op': train_op,
             'cross_entropy_loss': cross_entropy_loss,
+            'merged': merged,
             'input_image': input_image,
             'correct_label': correct_label,
             'keep_prob': keep_prob,
